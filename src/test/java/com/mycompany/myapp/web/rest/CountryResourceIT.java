@@ -4,6 +4,8 @@ import com.mycompany.myapp.JhipsterSampleApplicationApp;
 import com.mycompany.myapp.domain.Country;
 import com.mycompany.myapp.repository.CountryRepository;
 import com.mycompany.myapp.service.CountryService;
+import com.mycompany.myapp.service.dto.CountryDTO;
+import com.mycompany.myapp.service.mapper.CountryMapper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,6 +38,9 @@ public class CountryResourceIT {
 
     @Autowired
     private CountryRepository countryRepository;
+
+    @Autowired
+    private CountryMapper countryMapper;
 
     @Autowired
     private CountryService countryService;
@@ -82,9 +87,10 @@ public class CountryResourceIT {
         int databaseSizeBeforeCreate = countryRepository.findAll().size();
 
         // Create the Country
+        CountryDTO countryDTO = countryMapper.toDto(country);
         restCountryMockMvc.perform(post("/api/countries")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(country)))
+            .content(TestUtil.convertObjectToJsonBytes(countryDTO)))
             .andExpect(status().isCreated());
 
         // Validate the Country in the database
@@ -101,11 +107,12 @@ public class CountryResourceIT {
 
         // Create the Country with an existing ID
         country.setId(1L);
+        CountryDTO countryDTO = countryMapper.toDto(country);
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restCountryMockMvc.perform(post("/api/countries")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(country)))
+            .content(TestUtil.convertObjectToJsonBytes(countryDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Country in the database
@@ -154,7 +161,7 @@ public class CountryResourceIT {
     @Transactional
     public void updateCountry() throws Exception {
         // Initialize the database
-        countryService.save(country);
+        countryRepository.saveAndFlush(country);
 
         int databaseSizeBeforeUpdate = countryRepository.findAll().size();
 
@@ -164,10 +171,11 @@ public class CountryResourceIT {
         em.detach(updatedCountry);
         updatedCountry
             .countryName(UPDATED_COUNTRY_NAME);
+        CountryDTO countryDTO = countryMapper.toDto(updatedCountry);
 
         restCountryMockMvc.perform(put("/api/countries")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(updatedCountry)))
+            .content(TestUtil.convertObjectToJsonBytes(countryDTO)))
             .andExpect(status().isOk());
 
         // Validate the Country in the database
@@ -183,11 +191,12 @@ public class CountryResourceIT {
         int databaseSizeBeforeUpdate = countryRepository.findAll().size();
 
         // Create the Country
+        CountryDTO countryDTO = countryMapper.toDto(country);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restCountryMockMvc.perform(put("/api/countries")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(country)))
+            .content(TestUtil.convertObjectToJsonBytes(countryDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Country in the database
@@ -199,7 +208,7 @@ public class CountryResourceIT {
     @Transactional
     public void deleteCountry() throws Exception {
         // Initialize the database
-        countryService.save(country);
+        countryRepository.saveAndFlush(country);
 
         int databaseSizeBeforeDelete = countryRepository.findAll().size();
 

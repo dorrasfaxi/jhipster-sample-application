@@ -28,7 +28,7 @@
     ],
     "changelogDate": "20200422115400",
     "entityTableName": "department",
-    "dto": "no",
+    "dto": "mapstruct",
     "pagination": "no",
     "service": "serviceImpl",
     "jpaMetamodelFiltering": false,

@@ -1,29 +1,29 @@
 package com.mycompany.myapp.service;
 
-import com.mycompany.myapp.domain.Region;
+import com.mycompany.myapp.service.dto.RegionDTO;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Service Interface for managing {@link Region}.
+ * Service Interface for managing {@link com.mycompany.myapp.domain.Region}.
  */
 public interface RegionService {
 
     /**
      * Save a region.
      *
-     * @param region the entity to save.
+     * @param regionDTO the entity to save.
      * @return the persisted entity.
      */
-    Region save(Region region);
+    RegionDTO save(RegionDTO regionDTO);
 
     /**
      * Get all the regions.
      *
      * @return the list of entities.
      */
-    List<Region> findAll();
+    List<RegionDTO> findAll();
 
     /**
      * Get the "id" region.
@@ -31,7 +31,7 @@ public interface RegionService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<Region> findOne(Long id);
+    Optional<RegionDTO> findOne(Long id);
 
     /**
      * Delete the "id" region.

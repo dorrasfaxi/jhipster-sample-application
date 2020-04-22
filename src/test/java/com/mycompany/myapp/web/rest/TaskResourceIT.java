@@ -4,6 +4,8 @@ import com.mycompany.myapp.JhipsterSampleApplicationApp;
 import com.mycompany.myapp.domain.Task;
 import com.mycompany.myapp.repository.TaskRepository;
 import com.mycompany.myapp.service.TaskService;
+import com.mycompany.myapp.service.dto.TaskDTO;
+import com.mycompany.myapp.service.mapper.TaskMapper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,6 +41,9 @@ public class TaskResourceIT {
 
     @Autowired
     private TaskRepository taskRepository;
+
+    @Autowired
+    private TaskMapper taskMapper;
 
     @Autowired
     private TaskService taskService;
@@ -87,9 +92,10 @@ public class TaskResourceIT {
         int databaseSizeBeforeCreate = taskRepository.findAll().size();
 
         // Create the Task
+        TaskDTO taskDTO = taskMapper.toDto(task);
         restTaskMockMvc.perform(post("/api/tasks")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(task)))
+            .content(TestUtil.convertObjectToJsonBytes(taskDTO)))
             .andExpect(status().isCreated());
 
         // Validate the Task in the database
@@ -107,11 +113,12 @@ public class TaskResourceIT {
 
         // Create the Task with an existing ID
         task.setId(1L);
+        TaskDTO taskDTO = taskMapper.toDto(task);
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restTaskMockMvc.perform(post("/api/tasks")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(task)))
+            .content(TestUtil.convertObjectToJsonBytes(taskDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Task in the database
@@ -162,7 +169,7 @@ public class TaskResourceIT {
     @Transactional
     public void updateTask() throws Exception {
         // Initialize the database
-        taskService.save(task);
+        taskRepository.saveAndFlush(task);
 
         int databaseSizeBeforeUpdate = taskRepository.findAll().size();
 
@@ -173,10 +180,11 @@ public class TaskResourceIT {
         updatedTask
             .title(UPDATED_TITLE)
             .description(UPDATED_DESCRIPTION);
+        TaskDTO taskDTO = taskMapper.toDto(updatedTask);
 
         restTaskMockMvc.perform(put("/api/tasks")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(updatedTask)))
+            .content(TestUtil.convertObjectToJsonBytes(taskDTO)))
             .andExpect(status().isOk());
 
         // Validate the Task in the database
@@ -193,11 +201,12 @@ public class TaskResourceIT {
         int databaseSizeBeforeUpdate = taskRepository.findAll().size();
 
         // Create the Task
+        TaskDTO taskDTO = taskMapper.toDto(task);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restTaskMockMvc.perform(put("/api/tasks")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(task)))
+            .content(TestUtil.convertObjectToJsonBytes(taskDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Task in the database
@@ -209,7 +218,7 @@ public class TaskResourceIT {
     @Transactional
     public void deleteTask() throws Exception {
         // Initialize the database
-        taskService.save(task);
+        taskRepository.saveAndFlush(task);
 
         int databaseSizeBeforeDelete = taskRepository.findAll().size();
 

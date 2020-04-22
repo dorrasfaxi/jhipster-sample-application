@@ -30,8 +30,8 @@
                     <th scope="col"  jhiSortBy="hireDate"><span jhiTranslate="jhipsterSampleApplicationApp.employee.hireDate">Hire Date</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col"  jhiSortBy="salary"><span jhiTranslate="jhipsterSampleApplicationApp.employee.salary">Salary</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col"  jhiSortBy="commissionPct"><span jhiTranslate="jhipsterSampleApplicationApp.employee.commissionPct">Commission Pct</span> <fa-icon icon="sort"></fa-icon></th>
-                    <th scope="col"  jhiSortBy="manager.id"><span jhiTranslate="jhipsterSampleApplicationApp.employee.manager">Manager</span> <fa-icon icon="sort"></fa-icon></th>
-                    <th scope="col"  jhiSortBy="department.id"><span jhiTranslate="jhipsterSampleApplicationApp.employee.department">Department</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col"  jhiSortBy="managerId"><span jhiTranslate="jhipsterSampleApplicationApp.employee.manager">Manager</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col"  jhiSortBy="departmentId"><span jhiTranslate="jhipsterSampleApplicationApp.employee.department">Department</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col"></th>
                 </tr>
             </thead>
@@ -46,13 +46,13 @@
                     <td>{{ employee.salary }}</td>
                     <td>{{ employee.commissionPct }}</td>
                     <td>
-                        <div *ngIf="employee.manager">
-                            <a [routerLink]="['/employee', employee.manager?.id, 'view']" >{{ employee.manager?.id }}</a>
+                        <div *ngIf="employee.managerId">
+                            <a [routerLink]="['/employee', employee.managerId , 'view']" >{{ employee.managerId }}</a>
                         </div>
                     </td>
                     <td>
-                        <div *ngIf="employee.department">
-                            <a [routerLink]="['/department', employee.department?.id, 'view']" >{{ employee.department?.id }}</a>
+                        <div *ngIf="employee.departmentId">
+                            <a [routerLink]="['/department', employee.departmentId , 'view']" >{{ employee.departmentId }}</a>
                         </div>
                     </td>
                     <td class="text-right">

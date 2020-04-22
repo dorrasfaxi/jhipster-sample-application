@@ -4,6 +4,8 @@ import com.mycompany.myapp.JhipsterSampleApplicationApp;
 import com.mycompany.myapp.domain.Region;
 import com.mycompany.myapp.repository.RegionRepository;
 import com.mycompany.myapp.service.RegionService;
+import com.mycompany.myapp.service.dto.RegionDTO;
+import com.mycompany.myapp.service.mapper.RegionMapper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,6 +38,9 @@ public class RegionResourceIT {
 
     @Autowired
     private RegionRepository regionRepository;
+
+    @Autowired
+    private RegionMapper regionMapper;
 
     @Autowired
     private RegionService regionService;
@@ -82,9 +87,10 @@ public class RegionResourceIT {
         int databaseSizeBeforeCreate = regionRepository.findAll().size();
 
         // Create the Region
+        RegionDTO regionDTO = regionMapper.toDto(region);
         restRegionMockMvc.perform(post("/api/regions")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(region)))
+            .content(TestUtil.convertObjectToJsonBytes(regionDTO)))
             .andExpect(status().isCreated());
 
         // Validate the Region in the database
@@ -101,11 +107,12 @@ public class RegionResourceIT {
 
         // Create the Region with an existing ID
         region.setId(1L);
+        RegionDTO regionDTO = regionMapper.toDto(region);
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restRegionMockMvc.perform(post("/api/regions")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(region)))
+            .content(TestUtil.convertObjectToJsonBytes(regionDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Region in the database
@@ -154,7 +161,7 @@ public class RegionResourceIT {
     @Transactional
     public void updateRegion() throws Exception {
         // Initialize the database
-        regionService.save(region);
+        regionRepository.saveAndFlush(region);
 
         int databaseSizeBeforeUpdate = regionRepository.findAll().size();
 
@@ -164,10 +171,11 @@ public class RegionResourceIT {
         em.detach(updatedRegion);
         updatedRegion
             .regionName(UPDATED_REGION_NAME);
+        RegionDTO regionDTO = regionMapper.toDto(updatedRegion);
 
         restRegionMockMvc.perform(put("/api/regions")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(updatedRegion)))
+            .content(TestUtil.convertObjectToJsonBytes(regionDTO)))
             .andExpect(status().isOk());
 
         // Validate the Region in the database
@@ -183,11 +191,12 @@ public class RegionResourceIT {
         int databaseSizeBeforeUpdate = regionRepository.findAll().size();
 
         // Create the Region
+        RegionDTO regionDTO = regionMapper.toDto(region);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restRegionMockMvc.perform(put("/api/regions")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(region)))
+            .content(TestUtil.convertObjectToJsonBytes(regionDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Region in the database
@@ -199,7 +208,7 @@ public class RegionResourceIT {
     @Transactional
     public void deleteRegion() throws Exception {
         // Initialize the database
-        regionService.save(region);
+        regionRepository.saveAndFlush(region);
 
         int databaseSizeBeforeDelete = regionRepository.findAll().size();
 

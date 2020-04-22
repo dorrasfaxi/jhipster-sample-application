@@ -4,6 +4,8 @@ import com.mycompany.myapp.JhipsterSampleApplicationApp;
 import com.mycompany.myapp.domain.Location;
 import com.mycompany.myapp.repository.LocationRepository;
 import com.mycompany.myapp.service.LocationService;
+import com.mycompany.myapp.service.dto.LocationDTO;
+import com.mycompany.myapp.service.mapper.LocationMapper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,6 +47,9 @@ public class LocationResourceIT {
 
     @Autowired
     private LocationRepository locationRepository;
+
+    @Autowired
+    private LocationMapper locationMapper;
 
     @Autowired
     private LocationService locationService;
@@ -97,9 +102,10 @@ public class LocationResourceIT {
         int databaseSizeBeforeCreate = locationRepository.findAll().size();
 
         // Create the Location
+        LocationDTO locationDTO = locationMapper.toDto(location);
         restLocationMockMvc.perform(post("/api/locations")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(location)))
+            .content(TestUtil.convertObjectToJsonBytes(locationDTO)))
             .andExpect(status().isCreated());
 
         // Validate the Location in the database
@@ -119,11 +125,12 @@ public class LocationResourceIT {
 
         // Create the Location with an existing ID
         location.setId(1L);
+        LocationDTO locationDTO = locationMapper.toDto(location);
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restLocationMockMvc.perform(post("/api/locations")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(location)))
+            .content(TestUtil.convertObjectToJsonBytes(locationDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Location in the database
@@ -178,7 +185,7 @@ public class LocationResourceIT {
     @Transactional
     public void updateLocation() throws Exception {
         // Initialize the database
-        locationService.save(location);
+        locationRepository.saveAndFlush(location);
 
         int databaseSizeBeforeUpdate = locationRepository.findAll().size();
 
@@ -191,10 +198,11 @@ public class LocationResourceIT {
             .postalCode(UPDATED_POSTAL_CODE)
             .city(UPDATED_CITY)
             .stateProvince(UPDATED_STATE_PROVINCE);
+        LocationDTO locationDTO = locationMapper.toDto(updatedLocation);
 
         restLocationMockMvc.perform(put("/api/locations")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(updatedLocation)))
+            .content(TestUtil.convertObjectToJsonBytes(locationDTO)))
             .andExpect(status().isOk());
 
         // Validate the Location in the database
@@ -213,11 +221,12 @@ public class LocationResourceIT {
         int databaseSizeBeforeUpdate = locationRepository.findAll().size();
 
         // Create the Location
+        LocationDTO locationDTO = locationMapper.toDto(location);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restLocationMockMvc.perform(put("/api/locations")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(location)))
+            .content(TestUtil.convertObjectToJsonBytes(locationDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Location in the database
@@ -229,7 +238,7 @@ public class LocationResourceIT {
     @Transactional
     public void deleteLocation() throws Exception {
         // Initialize the database
-        locationService.save(location);
+        locationRepository.saveAndFlush(location);
 
         int databaseSizeBeforeDelete = locationRepository.findAll().size();
 

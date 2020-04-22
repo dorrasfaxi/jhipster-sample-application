@@ -1,6 +1,5 @@
 package com.mycompany.myapp.domain;
 
-import io.swagger.annotations.ApiModel;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -12,7 +11,6 @@ import java.util.Objects;
 /**
  * not an ignored comment
  */
-@ApiModel(description = "not an ignored comment")
 @Entity
 @Table(name = "location")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)

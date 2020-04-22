@@ -4,6 +4,8 @@ import com.mycompany.myapp.JhipsterSampleApplicationApp;
 import com.mycompany.myapp.domain.Department;
 import com.mycompany.myapp.repository.DepartmentRepository;
 import com.mycompany.myapp.service.DepartmentService;
+import com.mycompany.myapp.service.dto.DepartmentDTO;
+import com.mycompany.myapp.service.mapper.DepartmentMapper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,6 +38,9 @@ public class DepartmentResourceIT {
 
     @Autowired
     private DepartmentRepository departmentRepository;
+
+    @Autowired
+    private DepartmentMapper departmentMapper;
 
     @Autowired
     private DepartmentService departmentService;
@@ -82,9 +87,10 @@ public class DepartmentResourceIT {
         int databaseSizeBeforeCreate = departmentRepository.findAll().size();
 
         // Create the Department
+        DepartmentDTO departmentDTO = departmentMapper.toDto(department);
         restDepartmentMockMvc.perform(post("/api/departments")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(department)))
+            .content(TestUtil.convertObjectToJsonBytes(departmentDTO)))
             .andExpect(status().isCreated());
 
         // Validate the Department in the database
@@ -101,11 +107,12 @@ public class DepartmentResourceIT {
 
         // Create the Department with an existing ID
         department.setId(1L);
+        DepartmentDTO departmentDTO = departmentMapper.toDto(department);
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restDepartmentMockMvc.perform(post("/api/departments")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(department)))
+            .content(TestUtil.convertObjectToJsonBytes(departmentDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Department in the database
@@ -122,10 +129,11 @@ public class DepartmentResourceIT {
         department.setDepartmentName(null);
 
         // Create the Department, which fails.
+        DepartmentDTO departmentDTO = departmentMapper.toDto(department);
 
         restDepartmentMockMvc.perform(post("/api/departments")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(department)))
+            .content(TestUtil.convertObjectToJsonBytes(departmentDTO)))
             .andExpect(status().isBadRequest());
 
         List<Department> departmentList = departmentRepository.findAll();
@@ -172,7 +180,7 @@ public class DepartmentResourceIT {
     @Transactional
     public void updateDepartment() throws Exception {
         // Initialize the database
-        departmentService.save(department);
+        departmentRepository.saveAndFlush(department);
 
         int databaseSizeBeforeUpdate = departmentRepository.findAll().size();
 
@@ -182,10 +190,11 @@ public class DepartmentResourceIT {
         em.detach(updatedDepartment);
         updatedDepartment
             .departmentName(UPDATED_DEPARTMENT_NAME);
+        DepartmentDTO departmentDTO = departmentMapper.toDto(updatedDepartment);
 
         restDepartmentMockMvc.perform(put("/api/departments")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(updatedDepartment)))
+            .content(TestUtil.convertObjectToJsonBytes(departmentDTO)))
             .andExpect(status().isOk());
 
         // Validate the Department in the database
@@ -201,11 +210,12 @@ public class DepartmentResourceIT {
         int databaseSizeBeforeUpdate = departmentRepository.findAll().size();
 
         // Create the Department
+        DepartmentDTO departmentDTO = departmentMapper.toDto(department);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restDepartmentMockMvc.perform(put("/api/departments")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(department)))
+            .content(TestUtil.convertObjectToJsonBytes(departmentDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Department in the database
@@ -217,7 +227,7 @@ public class DepartmentResourceIT {
     @Transactional
     public void deleteDepartment() throws Exception {
         // Initialize the database
-        departmentService.save(department);
+        departmentRepository.saveAndFlush(department);
 
         int databaseSizeBeforeDelete = departmentRepository.findAll().size();
 

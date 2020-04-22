@@ -4,6 +4,8 @@ import com.mycompany.myapp.JhipsterSampleApplicationApp;
 import com.mycompany.myapp.domain.JobHistory;
 import com.mycompany.myapp.repository.JobHistoryRepository;
 import com.mycompany.myapp.service.JobHistoryService;
+import com.mycompany.myapp.service.dto.JobHistoryDTO;
+import com.mycompany.myapp.service.mapper.JobHistoryMapper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,6 +47,9 @@ public class JobHistoryResourceIT {
 
     @Autowired
     private JobHistoryRepository jobHistoryRepository;
+
+    @Autowired
+    private JobHistoryMapper jobHistoryMapper;
 
     @Autowired
     private JobHistoryService jobHistoryService;
@@ -95,9 +100,10 @@ public class JobHistoryResourceIT {
         int databaseSizeBeforeCreate = jobHistoryRepository.findAll().size();
 
         // Create the JobHistory
+        JobHistoryDTO jobHistoryDTO = jobHistoryMapper.toDto(jobHistory);
         restJobHistoryMockMvc.perform(post("/api/job-histories")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(jobHistory)))
+            .content(TestUtil.convertObjectToJsonBytes(jobHistoryDTO)))
             .andExpect(status().isCreated());
 
         // Validate the JobHistory in the database
@@ -116,11 +122,12 @@ public class JobHistoryResourceIT {
 
         // Create the JobHistory with an existing ID
         jobHistory.setId(1L);
+        JobHistoryDTO jobHistoryDTO = jobHistoryMapper.toDto(jobHistory);
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restJobHistoryMockMvc.perform(post("/api/job-histories")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(jobHistory)))
+            .content(TestUtil.convertObjectToJsonBytes(jobHistoryDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the JobHistory in the database
@@ -173,7 +180,7 @@ public class JobHistoryResourceIT {
     @Transactional
     public void updateJobHistory() throws Exception {
         // Initialize the database
-        jobHistoryService.save(jobHistory);
+        jobHistoryRepository.saveAndFlush(jobHistory);
 
         int databaseSizeBeforeUpdate = jobHistoryRepository.findAll().size();
 
@@ -185,10 +192,11 @@ public class JobHistoryResourceIT {
             .startDate(UPDATED_START_DATE)
             .endDate(UPDATED_END_DATE)
             .language(UPDATED_LANGUAGE);
+        JobHistoryDTO jobHistoryDTO = jobHistoryMapper.toDto(updatedJobHistory);
 
         restJobHistoryMockMvc.perform(put("/api/job-histories")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(updatedJobHistory)))
+            .content(TestUtil.convertObjectToJsonBytes(jobHistoryDTO)))
             .andExpect(status().isOk());
 
         // Validate the JobHistory in the database
@@ -206,11 +214,12 @@ public class JobHistoryResourceIT {
         int databaseSizeBeforeUpdate = jobHistoryRepository.findAll().size();
 
         // Create the JobHistory
+        JobHistoryDTO jobHistoryDTO = jobHistoryMapper.toDto(jobHistory);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restJobHistoryMockMvc.perform(put("/api/job-histories")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(jobHistory)))
+            .content(TestUtil.convertObjectToJsonBytes(jobHistoryDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the JobHistory in the database
@@ -222,7 +231,7 @@ public class JobHistoryResourceIT {
     @Transactional
     public void deleteJobHistory() throws Exception {
         // Initialize the database
-        jobHistoryService.save(jobHistory);
+        jobHistoryRepository.saveAndFlush(jobHistory);
 
         int databaseSizeBeforeDelete = jobHistoryRepository.findAll().size();
 

@@ -1,8 +1,6 @@
 package com.mycompany.myapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -17,7 +15,6 @@ import java.util.Set;
 /**
  * The Employee entity.
  */
-@ApiModel(description = "The Employee entity.")
 @Entity
 @Table(name = "employee")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
@@ -32,7 +29,6 @@ public class Employee implements Serializable {
     /**
      * The firstname attribute.
      */
-    @ApiModelProperty(value = "The firstname attribute.")
     @Column(name = "first_name")
     private String firstName;
 
@@ -65,7 +61,6 @@ public class Employee implements Serializable {
     /**
      * Another side of the same relationship
      */
-    @ApiModelProperty(value = "Another side of the same relationship")
     @ManyToOne
     @JsonIgnoreProperties("employees")
     private Department department;
